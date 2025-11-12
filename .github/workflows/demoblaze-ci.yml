@@ -1,0 +1,41 @@
+name: DemoBlaze CI with Allure Report
+
+on:
+  push:
+    branches: [demoblaze-real]
+  schedule:                       # 每晚 02:00 自动跑
+    - cron: "0 2 * * *"
+  workflow_dispatch:              # 手动触发按钮
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r web_automation/requirements.txt
+
+      - name: Run pytest with Allure
+        run: |
+          cd web_automation
+          pytest demoblaze/ --alluredir=../reports --clean-alluredir
+
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: reports
+          allure_history: allure-history
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages
