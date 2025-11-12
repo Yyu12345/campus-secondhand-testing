@@ -1,0 +1,3 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","1439","test_add_cart","demoblaze","Wed Nov 12 21:04:00 UTC 2025","passed","Wed Nov 12 21:04:01 UTC 2025","TestCart","test_cart","",""
+"","6863","test_register_and_login","demoblaze","Wed Nov 12 21:03:52 UTC 2025","passed","Wed Nov 12 21:03:59 UTC 2025","TestAuth","test_auth","",""
