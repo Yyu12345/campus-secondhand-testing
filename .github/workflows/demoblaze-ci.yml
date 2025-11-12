@@ -3,9 +3,7 @@ name: DemoBlaze CI with Allure Report
 on:
   push:
     branches: [demoblaze-real]
-  schedule:                       # 每晚 02:00 自动跑
-    - cron: "0 2 * * *"
-  workflow_dispatch:              # 手动触发按钮
+  workflow_dispatch:
 
 jobs:
   test:
