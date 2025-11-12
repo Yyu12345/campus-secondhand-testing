@@ -1,15 +1,5 @@
 import pytest, time
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
-
-@pytest.fixture(scope="class")
-def driver():
-    drv = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    drv.maximize_window()
-    yield drv
-    drv.quit()
 
 class TestAuth:
     def test_register_and_login(self, driver):
@@ -21,7 +11,6 @@ class TestAuth:
         driver.find_element(By.ID, "sign-password").send_keys("123456")
         driver.find_element(By.XPATH, "//button[text()='Sign up']").click()
         time.sleep(1)
-        # 自动处理弹窗
         assert driver.switch_to.alert.text == "Sign up successful."
         driver.switch_to.alert.accept()
 

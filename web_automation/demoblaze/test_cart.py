@@ -1,4 +1,4 @@
-import pytest, time
+import time
 from selenium.webdriver.common.by import By
 
 class TestCart:
