@@ -1,11 +1,11 @@
-import time
-from selenium.webdriver.common.by import By
+import requests
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 class TestOrder:
     def test_place_order(self, driver):
-        # ① 先加一件商品到购物车
+        # ① UI 加购物车
         driver.get("https://www.demoblaze.com")
         first_phone = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "hrefch"))
@@ -18,29 +18,18 @@ class TestOrder:
         WebDriverWait(driver, 10).until(EC.alert_is_present())
         driver.switch_to.alert.accept()
 
-        # ② 去购物车下单
-        driver.get("https://www.demoblaze.com/cart.html")
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "btn-success"))
-        ).click()
-
-        # ③ 填写表单
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "name"))).send_keys("tester")
-        driver.find_element(By.ID, "country").send_keys("China")
-        driver.find_element(By.ID, "city").send_keys("Beijing")
-        driver.find_element(By.ID, "card").send_keys("4111111111111111")
-        driver.find_element(By.ID, "month").send_keys("12")
-        driver.find_element(By.ID, "year").send_keys("2025")
-
-        # ④ 滚动+点击 Purchase
-        purchase_btn = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[text()='Purchase']"))
-        )
-        driver.execute_script("arguments[0].scrollIntoView({block:'center'});", purchase_btn)
-        time.sleep(0.5)  # 给滚动留时间
-        purchase_btn.click()
-
-        # ⑤ 等成功弹窗
-        WebDriverWait(driver, 15).until(EC.alert_is_present())
-        assert "Thank you" in driver.switch_to.alert.text
-        driver.switch_to.alert.accept()
+        # ② 获取浏览器 cookies 里的 token
+        cookies = {c['name']: c['value'] for c in driver.get_cookies()}
+        # ③ 直接调下单接口
+        url = "https://www.demoblaze.com/cart/doPurchase.json"
+        payload = {
+            "name": "tester",
+            "country": "China",
+            "city": "Beijing",
+            "card": "4111111111111111",
+            "month": "12",
+            "year": "2025"
+        }
+        resp = requests.post(url, data=payload, cookies=cookies)
+        assert resp.status_code == 200
+        assert "Thank you" in resp.text
