@@ -1,11 +1,12 @@
 import requests
+import json
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 class TestOrder:
     def test_place_order(self, driver):
-        # ① UI 加购物车
+        # ① UI 加购物车（已有）
         driver.get("https://www.demoblaze.com")
         first_phone = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "hrefch"))
@@ -18,10 +19,8 @@ class TestOrder:
         WebDriverWait(driver, 10).until(EC.alert_is_present())
         driver.switch_to.alert.accept()
 
-        # ② 获取浏览器 cookies 里的 token
+        # ② 组装下单数据
         cookies = {c['name']: c['value'] for c in driver.get_cookies()}
-        # ③ 直接调下单接口
-        url = "https://www.demoblaze.com/cart/doPurchase.json"
         payload = {
             "name": "tester",
             "country": "China",
@@ -30,6 +29,15 @@ class TestOrder:
             "month": "12",
             "year": "2025"
         }
-        resp = requests.post(url, data=payload, cookies=cookies)
+
+        # ③ 调真实接口
+        resp = requests.post(
+            "https://api.demoblaze.com/placeOrder",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(payload),
+            cookies=cookies
+        )
+
+        # ④ 断言
         assert resp.status_code == 200
         assert "Thank you" in resp.text
