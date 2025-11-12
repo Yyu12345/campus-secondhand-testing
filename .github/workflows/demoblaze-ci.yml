@@ -10,27 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
       - name: Install dependencies
         run: |
           pip install -r web_automation/requirements.txt
-
       - name: Run pytest with Allure
         run: |
           cd web_automation
           pytest demoblaze/ --alluredir=../reports --clean-alluredir
-
       - name: Generate Allure report
         uses: simple-elf/allure-report-action@master
         with:
           allure_results: reports
           allure_history: allure-history
-
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
